@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://doorclient.github.io/Door-Client/sitemap.xml
