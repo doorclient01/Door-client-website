@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Door Client — A Lightweight, FPS-Focused Minecraft Launcher</title>
+<meta name="description" content="Door Client is a lightweight, FPS-focused Minecraft launcher with one-click mod install, custom HUD & cosmetics, and auto updates. Free download for Windows.">
+<meta name="keywords" content="Door Client, Minecraft launcher, Minecraft client, FPS boost Minecraft, Minecraft mods, Minecraft HUD">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://doorclient01.github.io/Door-client-website/">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<!-- Open Graph / social preview -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Door Client — A Lightweight, FPS-Focused Minecraft Launcher">
+<meta property="og:description" content="One-click mod install, custom HUD & cosmetics, smoother FPS. Free download for Windows.">
+<meta property="og:image" content="https://doorclient01.github.io/Door-client-website/logo.png">
+<meta property="og:url" content="https://doorclient01.github.io/Door-client-website/">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Door Client — A Lightweight, FPS-Focused Minecraft Launcher">
+<meta name="twitter:description" content="One-click mod install, custom HUD & cosmetics, smoother FPS. Free download for Windows.">
+<meta name="twitter:image" content="https://doorclient01.github.io/Door-client-website/logo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a060e;
+    --bg-2: #120a1a;
+    --deep: #2b0f3d;
+    --violet: #7c3aed;
+    --violet-2: #a855f7;
+    --lilac: #e4c9ff;
+    --lilac-soft: #cbb0e8;
+    --ink: #f5f0fa;
+    --ink-dim: #b9aecb;
+    --line: rgba(228,201,255,0.14);
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'Manrope', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  a{ color:inherit; text-decoration:none; }
+
+  ::selection{ background: var(--violet); color:#fff; }
+
+  :focus-visible{
+    outline: 2px solid var(--lilac);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
+
+  /* ---------- Nav ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    backdrop-filter: blur(14px);
+    background: rgba(10,6,14,0.6);
+    border-bottom: 1px solid var(--line);
+  }
+  nav{
+    max-width:1180px; margin:0 auto; padding:16px 32px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand img{ width:34px; height:34px; border-radius:8px; display:block; }
+  .brand span{
+    font-family:var(--display); font-weight:700; font-size:1.15rem;
+    letter-spacing:0.01em;
+  }
+  .navlinks{ display:flex; gap:36px; align-items:center; }
+  .navlinks a{
+    font-size:0.92rem; color:var(--ink-dim); font-weight:600;
+    transition:color .2s ease;
+  }
+  .navlinks a:hover{ color:var(--lilac); }
+  .nav-cta{
+    background: linear-gradient(135deg, var(--violet-2), var(--violet));
+    color:#fff !important; padding:9px 20px; border-radius:8px;
+    font-weight:700; font-size:0.88rem;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset, 0 8px 24px -8px rgba(124,58,237,0.7);
+  }
+  .navtoggle{ display:none; }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex; align-items:center;
+    padding: 140px 0 80px;
+    overflow:hidden;
+    background:
+      radial-gradient(60% 55% at 50% 18%, rgba(124,58,237,0.35), transparent 65%),
+      radial-gradient(90% 60% at 50% 100%, rgba(43,15,61,0.9), transparent 60%),
+      var(--bg);
+  }
+
+  .portal{
+    position:absolute; top:50%; left:50%;
+    width:min(90vw, 900px); aspect-ratio:1/1;
+    transform:translate(-50%,-50%);
+    z-index:0; pointer-events:none;
+  }
+  .portal svg{ width:100%; height:100%; display:block; }
+  .ring-a{ animation: spin 34s linear infinite; transform-origin:50% 50%; }
+  .ring-b{ animation: spin-rev 46s linear infinite; transform-origin:50% 50%; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  @keyframes spin-rev{ to{ transform:rotate(-360deg); } }
+
+  .hero-inner{
+    position:relative; z-index:2;
+    max-width:760px; margin:0 auto;
+    text-align:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:0.78rem; letter-spacing:0.08em;
+    color:var(--lilac-soft); text-transform:uppercase;
+    border:1px solid var(--line); padding:6px 14px; border-radius:999px;
+    background: rgba(124,58,237,0.08);
+    margin-bottom:28px;
+  }
+  .eyebrow .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--violet-2);
+    box-shadow:0 0 10px 2px var(--violet-2);
+  }
+
+  h1.hero-title{
+    font-family:var(--display); font-weight:700;
+    font-size: clamp(2.6rem, 6vw, 4.6rem);
+    line-height:1.04; letter-spacing:-0.02em;
+    margin-bottom:22px;
+  }
+  h1.hero-title .accent{
+    background: linear-gradient(120deg, var(--lilac) 10%, var(--violet-2) 55%, var(--violet) 90%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+
+  .hero p.sub{
+    font-size:1.08rem; color:var(--ink-dim); line-height:1.65;
+    max-width:520px; margin:0 auto 38px;
+  }
+
+  .hero-ctas{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 26px; border-radius:10px;
+    font-weight:700; font-size:0.96rem;
+    transition: transform .18s ease, box-shadow .18s ease, background .2s ease;
+    border:1px solid transparent;
+  }
+  .btn-primary{
+    background: linear-gradient(135deg, var(--violet-2), var(--violet));
+    color:#fff;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset, 0 14px 34px -12px rgba(124,58,237,0.85);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 0 0 1px rgba(255,255,255,0.1) inset, 0 18px 40px -10px rgba(168,85,247,0.9); }
+  .btn-ghost{
+    background: rgba(228,201,255,0.05);
+    border-color: var(--line);
+    color: var(--lilac);
+  }
+  .btn-ghost:hover{ background: rgba(228,201,255,0.1); transform:translateY(-2px); }
+
+  .hero-stats{
+    margin-top:64px; display:flex; justify-content:center; gap:56px;
+    flex-wrap:wrap;
+  }
+  .stat{ text-align:center; }
+  .stat b{
+    display:block; font-family:var(--mono); font-size:1.5rem;
+    color:var(--lilac); font-weight:500;
+  }
+  .stat span{ font-size:0.8rem; color:var(--ink-dim); letter-spacing:0.03em; }
+
+  /* ---------- Section shell ---------- */
+  section{ position:relative; padding:120px 0; }
+  .section-head{ max-width:640px; margin-bottom:64px; }
+  .section-head .k{
+    font-family:var(--mono); font-size:0.78rem; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--violet-2); margin-bottom:14px; display:block;
+  }
+  .section-head h2{
+    font-family:var(--display); font-weight:700;
+    font-size: clamp(1.9rem, 3.6vw, 2.6rem); line-height:1.15; letter-spacing:-0.01em;
+    margin-bottom:16px;
+  }
+  .section-head p{ color:var(--ink-dim); font-size:1.02rem; line-height:1.6; }
+
+  /* arc divider — echoes the ring in the mark */
+  .divider{
+    height:120px; position:relative; margin-top:-1px;
+  }
+  .divider svg{ width:100%; height:100%; display:block; }
+
+  /* ---------- Features ---------- */
+  .features{ background: var(--bg-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .feature-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
+    background: var(--line);
+    border:1px solid var(--line); border-radius:16px; overflow:hidden;
+  }
+  .feature{
+    background: var(--bg-2);
+    padding:34px 30px;
+    transition: background .25s ease;
+  }
+  .feature:hover{ background: rgba(124,58,237,0.08); }
+  .feature .num{
+    font-family:var(--mono); color:var(--violet-2); font-size:0.8rem; margin-bottom:22px; display:block;
+  }
+  .feature-icon{
+    width:42px; height:42px; margin-bottom:20px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .feature h3{
+    font-family:var(--display); font-size:1.15rem; font-weight:600; margin-bottom:10px;
+  }
+  .feature p{ color:var(--ink-dim); font-size:0.92rem; line-height:1.6; }
+
+  /* ---------- Showcase ---------- */
+  .showcase-strip{
+    display:grid; grid-template-columns: 1.3fr 1fr; gap:20px;
+  }
+  .frame{
+    position:relative; border-radius:16px; overflow:hidden;
+    border:1px solid var(--line);
+    background: linear-gradient(160deg, rgba(124,58,237,0.18), rgba(10,6,14,0.4));
+    aspect-ratio:16/11;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .frame.tall{ aspect-ratio:auto; }
+  .showcase-strip .frame:first-child{ grid-row: span 2; aspect-ratio:auto; }
+  .frame .glyph{ opacity:0.5; width:34%; }
+  .frame .tag{
+    position:absolute; bottom:16px; left:16px;
+    font-family:var(--mono); font-size:0.72rem; color:var(--lilac-soft);
+    background:rgba(10,6,14,0.65); border:1px solid var(--line);
+    padding:5px 10px; border-radius:6px;
+  }
+
+  /* ---------- Download ---------- */
+  /* ---------- Creators ---------- */
+  .creators{
+    background: var(--bg);
+    padding: 90px 0 110px;
+  }
+  .creator-grid{
+    display:flex; justify-content:center; gap:56px; flex-wrap:wrap;
+  }
+  .creator-card{
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+  }
+  .creator-avatar{
+    width:96px; height:96px; border-radius:16px;
+    border:1px solid var(--line);
+    image-rendering:pixelated;
+    background: rgba(228,201,255,0.04);
+    box-shadow: 0 14px 34px -14px rgba(124,58,237,0.6);
+    transition: transform .2s ease, border-color .2s ease;
+  }
+  .creator-avatar:hover{ transform: translateY(-4px); border-color: var(--violet-2); }
+  .creator-name{
+    font-family:var(--display); font-weight:600; font-size:1rem; color:var(--lilac);
+  }
+
+  .download{
+    background:
+      radial-gradient(70% 100% at 50% 100%, rgba(124,58,237,0.28), transparent 60%),
+      var(--bg);
+    text-align:center;
+  }
+  .download .section-head{ margin:0 auto 48px; text-align:center; }
+  .platforms{
+    display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-bottom:30px;
+  }
+  .platform{
+    display:flex; align-items:center; gap:12px;
+    padding:16px 26px; border-radius:12px;
+    border:1px solid var(--line);
+    background: rgba(228,201,255,0.04);
+    min-width:190px; text-align:left;
+    transition: border-color .2s ease, transform .2s ease, background .2s ease;
+  }
+  .platform:hover{ border-color: var(--violet-2); transform:translateY(-3px); background: rgba(124,58,237,0.1); }
+  .platform .pname{ font-weight:700; font-size:0.95rem; }
+  .platform .pmeta{ font-family:var(--mono); font-size:0.72rem; color:var(--ink-dim); }
+
+  .version-note{ font-family:var(--mono); font-size:0.8rem; color:var(--ink-dim); }
+  .version-note b{ color:var(--lilac); }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:48px 0 36px;
+  }
+  .foot-row{
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:24px;
+  }
+  .foot-brand{ display:flex; align-items:center; gap:10px; }
+  .foot-brand img{ width:26px; height:26px; border-radius:6px; }
+  .foot-brand span{ font-family:var(--display); font-weight:700; }
+  .foot-links{ display:flex; gap:28px; flex-wrap:wrap; }
+  .foot-links a{ font-size:0.86rem; color:var(--ink-dim); transition:color .2s ease; }
+  .foot-links a:hover{ color:var(--lilac); }
+  .foot-legal{
+    margin-top:28px; font-size:0.78rem; color:#6f6480;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px){
+    .navlinks{ display:none; }
+    .feature-grid{ grid-template-columns:1fr; }
+    .showcase-strip{ grid-template-columns:1fr; }
+    .showcase-strip .frame:first-child{ grid-row:auto; aspect-ratio:16/11; }
+    .hero-stats{ gap:36px; }
+    section{ padding:80px 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="brand">
+      <img src="logo.png" alt="Door Client logo">
+      <span>Door Client</span>
+    </div>
+    <div class="navlinks">
+      <a href="#features">Features</a>
+      <a href="#showcase">Showcase</a>
+      <a href="#download">Download</a>
+      <a href="#" class="nav-cta">Get started</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="portal" aria-hidden="true">
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g class="ring-a">
+          <ellipse cx="200" cy="200" rx="170" ry="60" stroke="url(#g1)" stroke-width="2" opacity="0.55"/>
+        </g>
+        <g class="ring-b">
+          <ellipse cx="200" cy="200" rx="140" ry="46" stroke="url(#g2)" stroke-width="1.5" opacity="0.4" transform="rotate(35 200 200)"/>
+        </g>
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#a855f7"/>
+            <stop offset="0.5" stop-color="#e4c9ff"/>
+            <stop offset="1" stop-color="#7c3aed"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="400" y1="0" x2="0" y2="400" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#7c3aed"/>
+            <stop offset="1" stop-color="#e4c9ff"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="wrap hero-inner">
+      <span class="eyebrow"><span class="dot"></span> Now open for early access</span>
+      <h1 class="hero-title">A different <span class="accent">door</span> into Minecraft.</h1>
+      <p class="sub">Door Client is a lightweight launcher and client built for players who want more control — smoother performance, deeper customization, and a cleaner way to play.</p>
+      <div class="hero-ctas">
+        <a href="https://github.com/doorclient01/Door-client-website/releases/download/v1.0/DoorClient-1.0.0.1.exe" class="btn btn-primary">Download Door Client</a>
+        <a href="#features" class="btn btn-ghost">See what's inside</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b>1-click</b><span>mod install</span></div>
+        <div class="stat"><b>+40%</b><span>avg. FPS gain</span></div>
+        <div class="stat"><b>Windows</b><span>supported</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="features">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="k">What's inside</span>
+        <h2>Everything you need, nothing you don't.</h2>
+        <p>Door Client wraps the parts of the modded experience that actually matter into one clean launcher — so setup takes seconds, not evenings.</p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature">
+          <span class="num">01</span>
+          <div class="feature-icon">
+            <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><path d="M21 4L36 12.5V29.5L21 38L6 29.5V12.5L21 4Z" stroke="#a855f7" stroke-width="1.6"/><path d="M21 12L29 16.5V25.5L21 30L13 25.5V16.5L21 12Z" fill="#a855f7" fill-opacity="0.25" stroke="#e4c9ff" stroke-width="1.2"/></svg>
+          </div>
+          <h3>Performance boost</h3>
+          <p>Optimized rendering and chunk handling for noticeably smoother, higher FPS gameplay out of the box.</p>
+        </div>
+        <div class="feature">
+          <span class="num">02</span>
+          <div class="feature-icon">
+            <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><rect x="7" y="7" width="28" height="28" rx="6" stroke="#a855f7" stroke-width="1.6"/><path d="M14 21H28M21 14V28" stroke="#e4c9ff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <h3>One-click mod install</h3>
+          <p>Browse, install, and update mods from inside the launcher — no manual file dragging, no version guesswork.</p>
+        </div>
+        <div class="feature">
+          <span class="num">03</span>
+          <div class="feature-icon">
+            <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><circle cx="21" cy="21" r="14" stroke="#a855f7" stroke-width="1.6"/><circle cx="21" cy="21" r="6" fill="#a855f7" fill-opacity="0.3" stroke="#e4c9ff" stroke-width="1.2"/></svg>
+          </div>
+          <h3>Custom HUD & cosmetics</h3>
+          <p>Personalize your overlay, cape, and in-game look with options that stay out of your way while you play.</p>
+        </div>
+        <div class="feature">
+          <span class="num">04</span>
+          <div class="feature-icon">
+            <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><path d="M8 30V16L21 8L34 16V30" stroke="#a855f7" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 30V21H26V30" stroke="#e4c9ff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Own launcher</h3>
+          <p>A dedicated launcher handles accounts, versions, and updates — Door Client stays out of your Minecraft folder.</p>
+        </div>
+        <div class="feature">
+          <span class="num">05</span>
+          <div class="feature-icon">
+            <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><path d="M21 6C13 6 6 13 6 21C6 29 13 36 21 36" stroke="#a855f7" stroke-width="1.6" stroke-linecap="round"/><path d="M28 12L34 12L34 18" stroke="#e4c9ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M34 12L23 23" stroke="#e4c9ff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Auto updates</h3>
+          <p>New builds roll out automatically, so you're always running the latest, most stable version of the client.</p>
+        </div>
+        <div class="feature">
+          <span class="num">06</span>
+          <div class="feature-icon">
+            <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><rect x="9" y="12" width="24" height="18" rx="3" stroke="#a855f7" stroke-width="1.6"/><path d="M9 18H33" stroke="#e4c9ff" stroke-width="1.6"/></svg>
+          </div>
+          <h3>Built by players</h3>
+          <p>Made and maintained by a small team that actually plays with it daily — features ship because we wanted them too.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" aria-hidden="true">
+    <svg viewBox="0 0 1180 120" preserveAspectRatio="none">
+      <path d="M0,0 C 300,120 880,120 1180,0 L1180,0 L0,0 Z" fill="var(--bg)"/>
+    </svg>
+  </div>
+
+  <section id="showcase">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="k">Showcase</span>
+        <h2>What it looks like in-game.</h2>
+        <p>A quick look at the launcher and the HUD — screenshots go here once your build is ready to show off.</p>
+      </div>
+      <div class="showcase-strip">
+        <div class="frame">
+          <svg class="glyph" viewBox="0 0 42 42" fill="none"><path d="M21 4L36 12.5V29.5L21 38L6 29.5V12.5L21 4Z" stroke="#e4c9ff" stroke-width="1"/></svg>
+          <span class="tag">launcher — home</span>
+        </div>
+        <div class="frame">
+          <svg class="glyph" viewBox="0 0 42 42" fill="none"><rect x="9" y="12" width="24" height="18" rx="3" stroke="#e4c9ff" stroke-width="1"/></svg>
+          <span class="tag">in-game HUD</span>
+        </div>
+        <div class="frame">
+          <svg class="glyph" viewBox="0 0 42 42" fill="none"><circle cx="21" cy="21" r="14" stroke="#e4c9ff" stroke-width="1"/></svg>
+          <span class="tag">mod browser</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="download">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="k">Get Door Client</span>
+        <h2>Step through the door.</h2>
+        <p>Free to download. Pick your platform below to get the latest build.</p>
+      </div>
+      <div class="platforms">
+        <a href="https://github.com/doorclient01/Door-client-website/releases/download/v1.0/DoorClient-1.0.0.1.exe" class="platform">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M2 4L10 3V10.5H2V4Z" fill="#e4c9ff"/><path d="M11.5 2.8L20 1.5V10.4H11.5V2.8Z" fill="#e4c9ff"/><path d="M2 11.5H10V19L2 18V11.5Z" fill="#e4c9ff"/><path d="M11.5 11.5H20V20.5L11.5 19.2V11.5Z" fill="#e4c9ff"/></svg>
+          <span><span class="pname">Windows</span><br><span class="pmeta">.exe installer</span></span>
+        </a>
+      </div>
+      <p class="version-note">Latest build: <b>v1.0.0</b></p>
+    </div>
+  </section>
+
+  <section id="creators" class="creators">
+    <div class="wrap">
+      <div class="section-head" style="text-align:center; margin:0 auto 48px;">
+        <span class="k">Made by</span>
+        <h2>The people behind Door Client.</h2>
+      </div>
+      <div class="creator-grid">
+        <div class="creator-card">
+          <img src="saturomc_head.png" alt="SaturoMc" class="creator-avatar">
+          <span class="creator-name">SaturoMc</span>
+        </div>
+        <div class="creator-card">
+          <img src="alsofoxy_head.png" alt="AlsoFoxy" class="creator-avatar">
+          <span class="creator-name">AlsoFoxy</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <div class="foot-brand">
+        <img src="logo.png" alt="Door Client logo">
+        <span>Door Client</span>
+      </div>
+      <div class="foot-links">
+        <a href="#">Discord</a>
+        <a href="#">GitHub</a>
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Door Client. Not affiliated with Mojang or Microsoft.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
